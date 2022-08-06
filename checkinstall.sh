@@ -2,7 +2,7 @@
 #set -x
 #clear
 
-# Configurathion parameters
+# Configuration parameters
 	alias ls='ls --color=auto';
 	PRODUCT="onlyoffice";
 	DIR="/var/www/${PRODUCT}";
@@ -23,7 +23,7 @@
 
 while [ "$1" != "" ]; do
 	if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
-		echo "Create by grig.alste";
+		echo -e "${Black}Created by grigalste${Color_Off}";
 		echo "Usage: checkinstall.sh [OPTIONS]";
 		echo "  -h, --help          Display this help and exit;";
 		echo "  --checkdb           Check connecthion to MySQL database.";
@@ -35,41 +35,58 @@ while [ "$1" != "" ]; do
 	shift
 done
 
-#Not required in this version
-#root_checking () {
-#	if [ ! $( id -u ) -eq 0 ]; then
-#		echo "To perform this action you must be logged in with root rights"
-#		exit 1;
-#	fi
-#}
-#root_checking
+# Not required in this version
+	#root_checking () {
+	#	if [ ! $( id -u ) -eq 0 ]; then
+	#		echo "To perform this action you must be logged in with root rights"
+	#		exit 1;
+	#	fi
+	#}
+	#root_checking
 
 command_exists () {
 	type "$1" &> /dev/null;
 	}
 
 check_daemon() {
+	SVC="";
+	SVCE="";
+	SVC_ERROR="";
+	IS_ENABLED="";
+	IS_ACTIVE="";
 	for SVC in $@
 		do
-		#Service IS-ENABLE	
+		
+		
+		#Check Service IS-ENABLE	
 			if [[ "$(systemctl is-enabled $SVC.service 2> /dev/null)" == "enabled" ]]; then
-			        echo -e $SVC: ${Green}$(systemctl is-enabled $SVC.service 2> /dev/null)${Color_Off};
-			elif [[ "$(systemctl is-enabled $SVC.service 2> /dev/null)" != "enabled" ]]; then
-				echo -e $SVC is-enabled: ${Red}$(systemctl is-enabled $SVC.service 2>&1 )${Color_Off};
+			        IS_ENABLED=${Green}$(systemctl is-enabled $SVC.service 2> /dev/null)${Color_Off};
+			elif [[ "$(systemctl is-enabled $SVC.service 2> /dev/null)" == "disabled" ]]; then #disabled on centos but service none
+				IS_ENABLED=${Red}$(systemctl is-enabled $SVC.service 2>&1 )${Color_Off};
+			elif [[ "$(systemctl is-enabled $SVC.service 2> /dev/null)" == "" ]]; then
+				IS_ENABLED=${Red}"NOT AVAILABLE"${Color_Off};
 	          	fi
-		#Service IS-ACTIVE	
+	          	
+		#Check Service IS-ACTIVE	
 			if [[ "$(systemctl is-active $SVC.service 2> /dev/null)" == "active" ]]; then
-	                        echo -e $SVC: ${Green}$(systemctl is-active $SVC.service 2> /dev/null)${Color_Off};
-			elif [[ "$(systemctl is-active $SVC.service 2> /dev/null)" == "inactive" ]]; then
-				echo -e $SVC is-active: ${Red}$(systemctl is-active $SVC.service 2>&1 )${Color_Off};
-				echo -e $SVC status: ;
-				echo -e ${Red}$(systemctl status $SVC.service 2>&1 )${Color_Off};	
-			elif [[ "$(systemctl is-active $SVC.service 2> /dev/null)" != "active" ]]; then
-				echo -e $SVC is-active: ${Red}$(systemctl is-active $SVC.service 2>&1 )${Color_Off};
-				echo -e $SVC status: ;
-				echo -e ${Red}$(systemctl status $SVC.service 2>&1 )${Color_Off};	
+	                        IS_ACTIVE="${Green}$(systemctl is-active $SVC.service 2> /dev/null)${Color_Off}";
+			elif [[ "$(systemctl is-active $SVC.service 2> /dev/null)" != "active" ]]; then #unknown on centos but service none
+				IS_ACTIVE="${Red}$(systemctl is-active $SVC.service 2>&1 )${Color_Off}";
 	          	fi
+
+		#Show Service status
+			echo -e $SVC": is-enabled: "$IS_ENABLED" is-active: "$IS_ACTIVE ;
+			if [[ ( "$(systemctl is-enabled $SVC.service 2> /dev/null)" == "enabled" || "$(systemctl is-enabled $SVC.service 2> /dev/null)" == "disabled" ) && ( "$(systemctl is-active $SVC.service 2> /dev/null)" != "active" || "$(systemctl is-active $SVC.service 2> /dev/null)" == "unknown" ) ]] ; then
+				SVC_ERROR=$SVC_ERROR" "$SVC;
+			fi          	
 		done
+		
+		#Show ERROR Service status
+			for SVCE in $SVC_ERROR
+				do
+					echo " ";
+					systemctl status $SVCE.service 2> /dev/null | cat ;
+				done	
 	}
 	
 #Header
@@ -104,7 +121,7 @@ check_daemon() {
 echo -e "Hostname:${Green} $(hostname) ${Color_Off}";
 #echo $DISTR_ID $DISTR_NAME $DISTR_VERSION $DISTR_CODENAME
 
-#Check Dependes Version
+#Check Depends Version
 	echo " "
 	echo -e "${Yellow}### Check Dependes Version ###${Color_Off}";
 
@@ -207,7 +224,7 @@ echo -e "Hostname:${Green} $(hostname) ${Color_Off}";
 		apt list --installed 2> /dev/null | grep elasticsearch
 	fi
 
-#Check Dependes Daemon
+#Check Depends Daemon
 	echo " "
 	echo -e "${Yellow}### Check Dependes Daemon ###${Color_Off}";
 	
@@ -251,9 +268,9 @@ echo -e "Hostname:${Green} $(hostname) ${Color_Off}";
 		echo -e "${Red}NGINX not installed ${Color_Off}";
 	fi
 
-#Check Folder Permissons
+#Check Folder Permissions
 	echo " ";
-	echo -e "${Yellow}### Check Folder Permissons ###${Color_Off}";
+	echo -e "${Yellow}### Check Folder Permissions ###${Color_Off}";
 
 	if [ -d "${DIR}" ]; then
 		if [[ "$(ls -l ${DIR}  | grep " root " | awk '{print $1" "$3" "$9}')" != "" ]]; then
