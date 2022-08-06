@@ -129,7 +129,7 @@ echo -e "Hostname:${Green} $(hostname) ${Color_Off}";
 
 #Check Depends Version
 	echo " "
-	echo -e "${Yellow}### Check Dependes Version ###${Color_Off}";
+	echo -e "${Yellow}### Check Depends Version ###${Color_Off}";
 
 	CLI_NAME=(nginx dotnet mono mysql python3 pip node npm certbot snap redis-server psql rabbitmqctl supervisord);
 
@@ -232,7 +232,7 @@ echo -e "Hostname:${Green} $(hostname) ${Color_Off}";
 
 #Check Depends Daemon
 	echo " "
-	echo -e "${Yellow}### Check Dependes Daemon ###${Color_Off}";
+	echo -e "${Yellow}### Check Depends Daemon ###${Color_Off}";
 	
 	check_daemon "${SVC_DEP[*]}"
 
