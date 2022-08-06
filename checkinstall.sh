@@ -8,32 +8,38 @@
 	DIR="/var/www/${PRODUCT}";
 	LOG_DIR="/var/log/${PRODUCT}";
 
-# Regular Colors
-	Black="\033[0;30m"        # Black
-	Red="\033[0;31m"          # Red
-	Green="\033[0;32m"        # Green
-	BGreen="\033[1;32m"   # Bold Green
-	Yellow="\033[0;33m"       # Yellow
-	Blue="\033[0;34m"         # Blue
-	Purple="\033[0;35m"       # Purple
-	Cyan="\033[0;36m"         # Cyan
-	White="\033[0;37m"        # White
-# Reset
-	Color_Off="\033[0m"       # Text Reset
-
 while [ "$1" != "" ]; do
 	if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
 		echo -e "${Black}Created by grigalste${Color_Off}";
 		echo "Usage: checkinstall.sh [OPTIONS]";
 		echo "  -h, --help          Display this help and exit;";
+		echo "  --nocolor           Do not color the output;";
 		echo "  --checkdb           Check connecthion to MySQL database.";
 		exit 1;
 	fi
 	if [ "$1" == "--checkdb" ] ; then
 		CHECKDB="true";
 	fi
+	if [ "$1" == "--nocolor" ] ; then
+			NOCOLOR="true";
+	fi
 	shift
 done
+
+	if [ "$NOCOLOR" != "true" ] ; then
+		# Regular Colors
+			Black="\033[0;30m"        # Black
+			Red="\033[0;31m"          # Red
+			Green="\033[0;32m"        # Green
+			BGreen="\033[1;32m"   # Bold Green
+			Yellow="\033[0;33m"       # Yellow
+			Blue="\033[0;34m"         # Blue
+			Purple="\033[0;35m"       # Purple
+			Cyan="\033[0;36m"         # Cyan
+			White="\033[0;37m"        # White
+		# Reset
+			Color_Off="\033[0m"       # Text Reset
+	fi
 
 # Not required in this version
 	#root_checking () {
