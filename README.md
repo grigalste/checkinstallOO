@@ -6,6 +6,6 @@
 		  --nocolor           Do not color the output.
 ## Example
 ### Check installation and connecthion to MySQL database:
-		checkinstall.sh --checkdb 
+		bash checkinstall.sh --checkdb 
 ### Output in `checkinstall.log` file and disable color the output:
-		checkinstall.sh --checkdb --nocolor > checkinstall.log
+		bash checkinstall.sh --checkdb --nocolor > checkinstall.log
