@@ -7,26 +7,27 @@
 	PRODUCT="onlyoffice";
 	DIR="/var/www/${PRODUCT}";
 	LOG_DIR="/var/log/${PRODUCT}";
+	COLOR="";
 
 while [ "$1" != "" ]; do
 	if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
 		echo -e "${Black}Created by grigalste${Color_Off}";
 		echo "Usage: checkinstall.sh [OPTIONS]";
 		echo "  -h, --help          Display this help and exit;";
-		echo "  --nocolor           Do not color the output;";
+		echo "  --color             Color the output;";
 		echo "  --checkdb           Check connecthion to MySQL database.";
 		exit 1;
 	fi
 	if [ "$1" == "--checkdb" ] ; then
 		CHECKDB="true";
 	fi
-	if [ "$1" == "--nocolor" ] ; then
-			NOCOLOR="true";
+	if [ "$1" == "--color" ] ; then
+			COLOR="true";
 	fi
 	shift
 done
 
-	if [ "$NOCOLOR" != "true" ] ; then
+	if [ "$COLOR" == "true" ] ; then
 		# Regular Colors
 			Black="\033[0;30m"        # Black
 			Red="\033[0;31m"          # Red
