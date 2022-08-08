@@ -9,6 +9,20 @@
 	LOG_DIR="/var/log/${PRODUCT}";
 	COLOR="";
 
+#Clear varibles on startup
+clear_variables() {
+	SRV_DAEMON="";
+	SVC_DEP="";
+	MYSQL="";
+	DB_CHECK_HOST="";
+	DB_CHECK_NAME="";
+	DB_CHECK_USER="";
+	DB_CHECK_PWD="";
+	DB_TABLES_COUNT="";
+}
+
+clear_variables
+
 while [ "$1" != "" ]; do
 	if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
 		echo -e "${Black}Created by grigalste${Color_Off}";
@@ -22,7 +36,7 @@ while [ "$1" != "" ]; do
 		CHECKDB="true";
 	fi
 	if [ "$1" == "--color" ] ; then
-			COLOR="true";
+		COLOR="true";
 	fi
 	shift
 done
@@ -40,6 +54,12 @@ done
 			White="\033[0;37m"        # White
 		# Reset
 			Color_Off="\033[0m"       # Text Reset
+	else
+			Yellow="";
+			Red="";
+			Green="";
+			BGreen="";
+			Color_Off="";
 	fi
 
 # Not required in this version
@@ -175,7 +195,7 @@ echo -e "Hostname:${Green} $(hostname) ${Color_Off}";
 			    ;;
         
 			  certbot)
-			    echo $(certbot --version 2> /dev/null);
+			    echo $(certbot --version);
 			    ;;
         
 			  snap)
@@ -351,4 +371,7 @@ mysql_check_connection() {
 		mysql_id_connection	
 		mysql_check_connection
 	fi
+	
+#Clear varibles in the end
+clear_variables
 	
