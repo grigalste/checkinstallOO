@@ -9,10 +9,12 @@
 	LOG_DIR="/var/log/${PRODUCT}";
 	COLOR="";
 
-#Clear varibles on startup
+# Clear varibles on startup
 clear_variables() {
 	SRV_DAEMON="";
 	SVC_DEP="";
+	CONFIG="";
+        MACHINE="";
 	MYSQL="";
 	DB_CHECK_HOST="";
 	DB_CHECK_NAME="";
@@ -212,8 +214,8 @@ echo -e "Hostname:${Green} $(hostname) ${Color_Off}";
 			    ;;
 
 			  rabbitmqctl)
-			    echo RabbitMQ: $(rabbitmqctl status 2> /dev/null | grep RabbitMQ |  cut -d"," -f4 | tr -d '"' | tr -d '}');
-			    echo Erlang: $(rabbitmqctl status 2> /dev/null | grep erts |  cut -d"(" -f2 | cut -d")" -f1);
+			    echo RabbitMQ: $(rabbitmqctl status 2> /dev/null | grep "RabbitMQ" | rev | cut -d"," -f2 | tr -d '}' | rev );
+			    #echo Erlang: $(rabbitmqctl status 2> /dev/null | grep erts |  cut -d"(" -f2 | cut -d")" -f1);
 			    ;;
 			
 			  supervisord)
@@ -295,6 +297,20 @@ echo -e "Hostname:${Green} $(hostname) ${Color_Off}";
 		echo -e "${Red}NGINX not installed ${Color_Off}";
 	fi
 
+#Check value core.machinekey in Configurations
+	echo " "
+	echo -e "${Yellow}### Check value core.machinekey in Configurations ###${Color_Off}";
+	if [ -d "$DIR" ]; then
+        	CONFIG=$(grep --exclude-dir='addons' --include=\*.{[cC]onfig,json} -rnw "$DIR" -e "core.machinekey" | cut -d":" -f1);
+        	MACHINE=$(grep "core.machinekey" $DIR/WebStudio/web.appsettings.config | cut -d"\"" -f4);
+        	for SVC in $CONFIG
+			do
+			        if [[ $MACHINE != "$(grep "core.machinekey" $SVC | cut -d"\"" -f4)" ]]; then
+				        echo -e "${Red}Value machine.key does not match in file $SVC ${Color_Off} ";
+				fi
+			done
+	fi
+
 #Check Folder Permissions
 	echo " ";
 	echo -e "${Yellow}### Check Folder Permissions ###${Color_Off}";
@@ -346,6 +362,11 @@ mysql_id_connection() {
 		DB_CHECK_NAME=$(cat $CONF/web.connections.config | grep "default" |  cut -d"=" -f5 | cut -d";" -f1);
 		DB_CHECK_USER=$(cat $CONF/web.connections.config | grep "default" |  cut -d"=" -f6 | cut -d";" -f1);
 		DB_CHECK_PWD=$(cat $CONF/web.connections.config | grep "default" |  cut -d"=" -f7 | cut -d";" -f1);
+
+		if [[ $DB_CHECK_PWD == "" ]]; then 
+			echo -e ${Red}"Password does not set"${Color_Off};
+		fi
+
 	fi
 }
 
