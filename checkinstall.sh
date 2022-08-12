@@ -7,6 +7,7 @@
 	PRODUCT="onlyoffice";
 	DIR="/var/www/${PRODUCT}";
 	LOG_DIR="/var/log/${PRODUCT}";
+	CHECKDB="";
 	COLOR="";
 
 # Clear varibles on startup
@@ -15,6 +16,8 @@ clear_variables() {
 	SVC_DEP="";
 	CONFIG="";
         MACHINE="";
+        GOD_SRV_DAEMON="";
+	GOD_SERVICE="";
 	MYSQL="";
 	DB_CHECK_HOST="";
 	DB_CHECK_NAME="";
@@ -28,13 +31,13 @@ clear_variables
 while [ "$1" != "" ]; do
 	if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
 		echo -e "${Black}Created by grigalste${Color_Off}";
-		echo "Usage: checkinstall.sh [OPTIONS]";
+		echo "Usage: $0 [OPTIONS]";
 		echo "  -h, --help          Display this help and exit;";
 		echo "  --color             Color the output;";
-		echo "  --checkdb           Check connecthion to MySQL database.";
+		echo "  --checkdb --db      Check connecthion to MySQL database.";
 		exit 1;
 	fi
-	if [ "$1" == "--checkdb" ] ; then
+	if [ "$1" == "--checkdb" ] || [ "$1" == "--db" ] ; then
 		CHECKDB="true";
 	fi
 	if [ "$1" == "--color" ] ; then
@@ -50,28 +53,25 @@ done
 			Green="\033[0;32m"        # Green
 			BGreen="\033[1;32m"   # Bold Green
 			Yellow="\033[0;33m"       # Yellow
-			Blue="\033[0;34m"         # Blue
-			Purple="\033[0;35m"       # Purple
-			Cyan="\033[0;36m"         # Cyan
-			White="\033[0;37m"        # White
 		# Reset
 			Color_Off="\033[0m"       # Text Reset
 	else
-			Yellow="";
+			Black="";
 			Red="";
 			Green="";
 			BGreen="";
+			Yellow="";
 			Color_Off="";
 	fi
 
 # Not required in this version
-	#root_checking () {
-	#	if [ ! $( id -u ) -eq 0 ]; then
-	#		echo "To perform this action you must be logged in with root rights"
-	#		exit 1;
-	#	fi
-	#}
-	#root_checking
+root_checking () {
+		if [ ! $( id -u ) -eq 0 ]; then
+			echo "To perform this action you must be logged in with root rights"
+			exit 1;
+		fi
+	}
+	root_checking
 
 command_exists () {
 	type "$1" &> /dev/null;
@@ -309,6 +309,18 @@ echo -e "Hostname:${Green} $(hostname) ${Color_Off}";
 				        echo -e "${Red}Value machine.key does not match in file $SVC ${Color_Off} ";
 				fi
 			done
+	fi
+	
+#Check service in God.service
+	echo " "
+	echo -e "${Yellow}### Check service in God.service ###${Color_Off}";
+	GOD_SRV_DAEMON=(AutoCleanUp Backup Feed Index MailCleaner MailWatchdog Notify Radicale SocketIO SsoAuth StorageEncryption StorageMigrate Telegram Thumb ThumbnailBuilder UrlShortener WebDav);
+	GOD_SERVICE=$(grep "%w" /etc/god/conf.d/services.god | cut -d "{" -f2 | cut -d "}" -f1);
+	if [[ $(echo ${GOD_SRV_DAEMON[@]} ${GOD_SERVICE[@]} | tr ' ' '\n' | sort | uniq -u) == "" ]]; then
+		echo -e "${Green}Correct service records${Color_Off}";
+	else
+		echo -e "${Red}Missing service records: ${Color_Off}";
+		echo -e "${Red}$(echo ${GOD_SRV_DAEMON[@]} ${GOD_SERVICE[@]} | tr ' ' '\n' | sort | uniq -u) ${Color_Off}";
 	fi
 
 #Check Folder Permissions
