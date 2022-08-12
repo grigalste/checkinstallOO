@@ -3,7 +3,7 @@
 		Usage: checkinstall.sh [OPTIONS]
 		  -h, --help          Display this help and exit;
 		  --color             Color the output;
-		  --checkdb           Check connecthion to MySQL database.
+		  --checkdb --db      Check connecthion to MySQL database.
 
 ## Example
 ### Check installation and connecthion to MySQL database:
