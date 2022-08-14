@@ -1,9 +1,9 @@
 # Check post installation and after update ONLYOFFICE Workspace
 
 		Usage: checkinstall.sh [OPTIONS]
-		  -h, --help          Display this help and exit;
-		  --color             Color the output;
-		  --checkdb --db      Check connecthion to MySQL database.
+		  -h, 	--help         	Display this help and exit;
+		  --color             	Color the output;
+		  --db, --checkdb     	Check connecthion to MySQL database.
 
 ## Example
 ### Check installation and connecthion to MySQL database:
